@@ -1,0 +1,86 @@
+---
+title: "Regression Models Porject"
+author: "Shawvin"
+date: "7/21/2019"
+output: pdf_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Executive summary
+The data comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobile.The project is to explore the relationship between transmission and mile per gallon(mpg).A regression model including all variable as regressors will be fit first and then step wise regression will be used to reduce the number of regressors and find the best regression model.
+
+
+## Exploratory data analyses
+```{r}
+suppressMessages(library(car))
+data(mtcars)
+dim(mtcars)
+str(mtcars)
+```
+As we can see from the brief summary, all the data type of these 11 variable are numeric. However, some variable are measuring the catogorical data, thus we should convert these data type to factor.
+
+```{r}
+mtcars$cyl<-factor(mtcars$cyl)
+mtcars$vs<-factor(mtcars$vs)
+levels(mtcars$vs)<-c("-Vshaped","-straight")
+mtcars$am<-factor(mtcars$am)
+levels(mtcars$am)<-c("-auto","-manual")
+mtcars$gear<-factor(mtcars$gear)
+mtcars$carb<-factor(mtcars$carb)
+```
+
+
+## Model Fitting
+we would like to explore the relationship between mpg and am. The simplest way is to fit a linear model between these two variable.
+```{r}
+fit1<-lm(mpg~am,mtcars)
+```
+As we can see, the R square is `r summary(fit1)$r.squared`. The model is underfit. The variance is biased.
+
+Next, we would fit a linear model that includes all regressors. 
+```{r}
+fitall<-lm(mpg~.,mtcars)
+```
+As we expect, more regressor increases the R squared (`r summary(fitall)$r.squared`) however this model dramtically inflate the variance.(refer to appendix) 
+
+Next, we would like to reduce the number of regressors.We use the method stepwise regression. Stepwise regression is a method of fitting regression models in which the choice of predictive variables is carried out by an automatic procedure. A variable is considered for subtraction from the set of explanatory variables based on some prespecified criterion.
+
+As we get from stepwise regression, the best model is to use these four regressors: cyl,hp,wt and am.
+```{r}
+fit_best<-lm(mpg~cyl+hp+wt+am,mtcars)
+anova(fit1,fit_best,fitall)
+shapiro.test(resid(fit_best))
+```
+The model with selcted four regressors is not significantly different from the model with all regressors. The R sqaured is `r summary(fit_best)$r.squared`. The residual will pass the normality test. 
+
+
+## Conclusion
+From the project we learn that the model with more regressors usally fits better but also increases the variance as the regressor may correlate with each other.
+
+From the model we chose, it is found that manual transmission is better for mpg. The difference will be difficult to quantify as it heavily depends on the model. From our model, the difference of mpg between automatic and manual transmission is `r summary(fit_best)$coef[6]`. 
+
+
+## Appendix
+```{r Appendix 1}
+str(mtcars)
+```
+
+```{r Appendix 2}
+summary(fit1)
+```
+```{r Appendix 3}
+summary(fitall)
+vif(fitall)
+```
+```{r Appendix 4}
+summary(fit_best)
+plot(fit_best,1)
+plot(predict(fit_best),resid(fit_best))
+plot(fit_best,2)
+```
+
+## Extra: Stepwise regression
+```{r}
+step(fitall)
+```

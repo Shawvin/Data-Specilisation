@@ -1,0 +1,52 @@
+---
+title: "Prediction Assignment"
+author: "Shawvin"
+date: "8/15/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Library loading and data downloading
+```{r}
+suppressPackageStartupMessages(library(DataExplorer))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(caret))
+
+if(! file.exists("training.csv"))
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv","training.csv")
+if(! file.exists("testing.csv"))
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv","testing.csv")
+```
+
+
+### Data Loading
+```{r,comment=""}
+training<-read.csv("training.csv")
+testing<-read.csv("testing.csv")
+dim(training)
+```
+The training set has`r dim(training)[1]` rows and `r dim(training)[2]` columns
+
+### Exploratory Data Analysis
+As we can see, there are more than 150 features for each observation, we would like to know which features are complete and suitable as candidate predictor.
+```{r,comment=""}
+plot_missing(training)
+```
+
+The are about 40% of features have more than 90% missing value, which renders the feature unusable.We would like to kick out these features.
+```{r,comment=""}
+index<-apply(training,2,function(x){sum(is.na(x))/length(x)>0.95})
+selected<-names(training)[!index]
+training<-training[,selected]
+```
+The first 6 features are experiment setting: sequence, names, timestamps...They are not useful in the predicting and should be excluded from the training.
+```{r,comment=""}
+training<-training[,-c(1:6)]
+```
+
+
+

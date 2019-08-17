@@ -1,0 +1,59 @@
+---
+title: "Week1 Quiz"
+author: "Shawvin"
+date: "7/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Quiz 1
+### Quiz, 10 questions
+
+1.Question 1
+
+Consider the data set given below 
+```{r}
+x <- c(0.18, -1.54, 0.42, 0.95)
+print(paste("x <-",list(x)))
+```
+
+And weights given by
+```{r}
+w <- c(2, 1, 3, 1)
+print(paste("w <-",list(w)))
+```
+
+Give the value of μ that minimizes the least squares equation
+$\sum_{i=1}^{n}w_{i}(x_{i}-u)^{2}$
+
+Answer:
+```{r}
+result<-sum(x*w)/sum(w)
+result
+```
+
+
+2.Question 2
+
+Consider the following data set
+```{r}
+x <- c(0.8, 0.47, 0.51, 0.73, 0.36, 0.58, 0.57, 0.85, 0.44, 0.42)
+y <- c(1.39, 0.72, 1.55, 0.48, 1.19, -1.59, 1.23, -0.65, 1.49, 0.05)
+print(paste("x <-",list(x)))
+print(paste("y <-",list(y)))
+```
+Fit the regression through the origin and get the slope treating y as the outcome and x as the regressor. (Hint, do not center the data since we want regression through the origin, not through the means of the data.)
+
+
+
+3. Question 3
+
+Do data(mtcars)from the datasets package and fit the regression model with mpg as the outcome and weight as the predictor. Give the slope coefficient.
+
+```{r}
+coeff<-cor(mtcars$wt,mtcars$mpg)
+coeff
+```

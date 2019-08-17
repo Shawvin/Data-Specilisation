@@ -1,0 +1,64 @@
+---
+title: "Statistical Inference Course Project part2"
+author: "Shawvin"
+date: "7/6/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 2: Basic Inferential Data Analysis Instructions
+
+### basic exploratory data analyses
+```{r,loading data}
+data(ToothGrowth)
+dim(ToothGrowth)
+head(ToothGrowth)
+table(ToothGrowth$supp,ToothGrowth$dose)
+```
+
+We load the ToothGrowth data. This dataframe has 60 rows and 3 columns. The first column is the length of tooth growth. The second column is the type of supplement used and the third column is the dose.
+
+We tabulate the supplement and dose and find that there are two supplement and three different dose used. 
+
+### basic summary of the data
+```{r,process data}
+suppressMessages(library(dplyr))
+library(ggplot2)
+plotdata<- ToothGrowth %>% group_by(supp,dose) %>% summarise(mean=mean(len),se=sd(len)/sqrt(length(len)))
+plotdata
+
+g<-ggplot(plotdata,aes(factor(dose),mean,group=supp,color=supp))
+g+geom_line(lwd=1)+geom_errorbar(aes(ymin=mean-se,ymax=mean+se),width=0.1)+labs(x="Dose",y="Length")+ggtitle("Tooth Growth")
+```
+By the type of supp and the dose, we separate the data into 6 groups and plot the mean and sem for each group. From the plotdata, we find that the length of tooth growth increases as the dose of supp increases. The OJ supplement has better improvement than VC supplement in tooth growth at lower dose (0.5 and 1). The effect of two supplements are comparable at higher dose (2).
+
+### Hypothesis testing
+```{r, hypothesis test}
+OJ_0.5<-ToothGrowth[ToothGrowth$supp=="OJ"&ToothGrowth$dose==0.5,]$len
+OJ_1<-ToothGrowth[ToothGrowth$supp=="OJ"&ToothGrowth$dose==1,]$len
+OJ_2<-ToothGrowth[ToothGrowth$supp=="OJ"&ToothGrowth$dose==2,]$len
+
+VC_0.5<-ToothGrowth[ToothGrowth$supp=="VC"&ToothGrowth$dose==0.5,]$len
+VC_1<-ToothGrowth[ToothGrowth$supp=="VC"&ToothGrowth$dose==1,]$len
+VC_2<-ToothGrowth[ToothGrowth$supp=="VC"&ToothGrowth$dose==2,]$len
+
+#IN OJ supplement groups,compare the effect of different dose
+t.test(OJ_0.5,OJ_1)$p.value
+t.test(OJ_1,OJ_2)$p.value
+
+#IN VC supplement groups,compare the effect of different dose
+t.test(VC_0.5,VC_1)$p.value
+t.test(VC_1,VC_2)$p.value
+
+#Compare OJ supplement and VC supplement at the same dose
+t.test(OJ_0.5,VC_0.5)$p.value
+t.test(OJ_1,VC_1)$p.value
+t.test(OJ_2,VC_2)$p.value
+```
+
+### Conclusion
+For both supplement, the teeth growth increases significantly as the dose increase. The effect of OJ is significantly better than that of VC at the dose of 0.5 and 1 but the effect are comparable between these two supplement at the dose of 2.
+

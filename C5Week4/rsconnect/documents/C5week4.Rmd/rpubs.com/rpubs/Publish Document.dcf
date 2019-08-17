@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/506458/bfad84e43cce47f6bffed352c431e0d8
+bundleId: https://api.rpubs.com/api/v1/document/506458/bfad84e43cce47f6bffed352c431e0d8
+url: http://rpubs.com/Shawvin/506458
+when: 1560964270.72187

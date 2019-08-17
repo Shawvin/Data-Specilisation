@@ -1,0 +1,92 @@
+---
+title: "Statistical inference course project"
+author: "Shawvin"
+date: "7/3/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1: Simulation exercise
+
+### Overview
+This Simulation exercise investigate the exponential distribution and compare it with Central Limit Theorem.The exponential distribution can be simulated in R as rexp(n,lambda). The mean and standard devitaion for the exponential distribution will be 1/lambda.
+
+### Simulations
+We will set lambda=0.2 for the simulation.The sample will be averages of 40 exponentials for 1000 simulation.
+
+```{r}
+set.seed(1234)
+lambda<-0.2
+mns<-NULL
+
+#1000 simulations are run, and each simulation will calculate the mean of 40 random exponential and generate 1 sample mean, so 1000 sample means will be collected.
+for(i in 1:1000)
+  mns<-c(mns,mean(rexp(40,lambda)))
+
+#Sample Mean will be the mean of these 1000 sample means 
+#Sample Variance will be the variance of these 1000 sample means
+Sample_Mean<-mean(mns)
+Sample_Var<-var(mns)
+
+#Theoretical Mean and Theoretical Variance are 1/lambda and 1/(lambda^2*n) respectivly
+Theoretical_Mean<-1/lambda
+Theoretical_Var<-1/(lambda^2*40)
+
+```
+
+### Sample Mean versus Theoretical Mean
+```{r echo=FALSE}
+hist(mns,xlab="sample means",breaks=20,main="Histogram of sample means")
+abline(v=Sample_Mean,col="red",lwd=2)
+Sample_Mean_label<-paste("Sample Mean",round(Sample_Mean,2),sep="")
+text(Sample_Mean,0,Sample_Mean_label,adj=c(1,0),col="red")
+abline(v=Theoretical_Mean,col="blue",lwd=2)
+Theoretical_Mean_label<-paste("Theoretical Mean=",round(Theoretical_Mean,2),sep="")
+text(Theoretical_Mean,0,Theoretical_Mean_label,adj=c(0,0),col="blue")
+```
+The histogram of 1000 sample means is plotted and the mean of these 1000 sample means is used as Sample Mean. In the plot, redline denotes the Sample Mean and the blue line denotes the Theoretical Mean. Their value are `r Sample_Mean` and `r Theoretical_Mean`
+
+### Sample Variance versus Theoretical Variance
+```{r,echo=FALSE}
+hist(mns-Sample_Mean,xlab="adjusted sample means",breaks=20,main="Histogram of sample means")
+abline(v=Sample_Var,col="red",lwd=2)
+Sample_Var_label<-paste("Sample Variance=",round(Sample_Var,2),sep="")
+text(Sample_Var,0,Sample_Var_label,adj=c(1,0),col="red")
+abline(v=Theoretical_Var,col="blue",lwd=2)
+Theoretical_Var_label<-paste("Theoretical Variance=",round(Theoretical_Var,2),sep="")
+text(Theoretical_Var,0,Theoretical_Var_label,adj=c(0,0),col="blue")
+```
+The histogram of 1000 sample means is plotted.Sample Variance is the variance of these 1000 sample means.For comparing the variance more esaily, the Sample Mean of these 1000 average is shifted to 0 by minusing Sample Mean from each sample mean. 
+
+In the plot, redline denotes the sample variance and the blue line denotes the theoretical variance. Their value are `r Sample_Var` and `r Theoretical_Var`
+
+### Distribution
+
+```{r echo=FALSE}
+norm_mns<-(mns-Sample_Mean)/sqrt(Sample_Var)
+hist(norm_mns,freq=FALSE,xlab="sd",xlim=c(-3,3),breaks=20,main="Histogram of normalized sample means")
+curve(dnorm(x),add=TRUE,xlim=c(-3,3),col="blue",lwd=2)
+sd<-NULL
+p_norm_mns<-NULL
+p_norm<-NULL
+
+for (i in -3:3)
+{sd<-c(sd,i)
+ p_norm_mns<-c(p_norm_mns,(sum(norm_mns<=i)/1000))
+ p_norm<-c(p_norm,(pnorm(i)))
+}
+sf<-data.frame(sd,p_norm_mns,p_norm)
+names(sf)<-c("sd","cum probability of Sample Mean distribution","cum probability of normal distribution")
+sf
+
+```
+
+These 1000 sample means are normlized and plotted.The probabily is compared to normal distribution.
+
+
