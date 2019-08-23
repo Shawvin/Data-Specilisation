@@ -2,7 +2,9 @@
 title: "Prediction Assignment"
 author: "Shawvin"
 date: "8/15/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -28,8 +30,10 @@ download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.c
 training<-read.csv("training.csv")
 testing<-read.csv("testing.csv")
 dim(training)
+t<-table(sapply(training,class))
+t
 ```
-The training set has`r dim(training)[1]` rows and `r dim(training)[2]` columns
+The training set has`r dim(training)[1]` rows and `r dim(training)[2]` columns.Among these columns, there are `r t[1]` facotr varibles, `r t[2]` integer varible and `r t[3]` numeric varible. 
 
 ### Exploratory Data Analysis
 As we can see, there are more than 150 features for each observation, we would like to know which features are complete and suitable as candidate predictor.
@@ -37,16 +41,42 @@ As we can see, there are more than 150 features for each observation, we would l
 plot_missing(training)
 ```
 
-The are about 40% of features have more than 90% missing value, which renders the feature unusable.We would like to kick out these features.
+The are features have more than 90% missing values, which renders the feature unusable.We would like to kick out these features.
 ```{r,comment=""}
-index<-apply(training,2,function(x){sum(is.na(x))/length(x)>0.95})
-selected<-names(training)[!index]
-training<-training[,selected]
+## index1 checks the missing value in integer and numeric varibles
+index1<-apply(training,2,function(x){sum(is.na(x))/length(x)>0.95})
+training<-training[,!index1]
+## index2 checks the missing value in factor varibles
+index2<-apply(training,2,function(x){sum(x=="")/length(x)>0.95})
+training<-training[,!index2]
 ```
-The first 6 features are experiment setting: sequence, names, timestamps...They are not useful in the predicting and should be excluded from the training.
+After clearing those varibles that contain too much varible, we would like to clear other varibles deemed of no use in predicting.
+The first 7 features except names are experiment setting: sequence, timestamps...They are not useful in the predicting and should be excluded from the prediction.
 ```{r,comment=""}
-training<-training[,-c(1:6)]
+training<-training[,-c(1,3:7)]
+dim(training)
 ```
 
+### Building models and selecting the model to predict
+The models will have in sample and out of sample errors. In sample error occurs in the training set, and out of sample occurs when the model is applied in new data set. To reduce the out of sample, cross validation is used. Part of the training set is used as validation. 
+In this analysis, k-fold cross validation is used.
+Four methods are selected to train the model. They tree, random forest, boosting tree and linear discriminant analysis.
+
+```{r,comment=""}
+traincontrol<-trainControl(method="cv")
+modFit1<-train(classe~.,data=training,method="rpart",trControl=traincontrol)
+modFit2<-train(classe~.,data=training,method="rf",trControl=traincontrol)
+modFit3<-train(classe~.,data=training,method="gbm",trControl=traincontrol,verbose=FALSE)
+modFit4<-train(classe~.,data=training,method="lda",trControl=traincontrol)
+
+modFit1
+modFit2
+modFit3
+modFit4
+result<-predict(modFit2,testing)
+result
+```
+
+As we can see, the random forest model has the highest accuracy. The model is used to predict the testing set.
 
 
