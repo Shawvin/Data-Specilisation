@@ -1,0 +1,31 @@
+---
+title: "R Markdown and Leaflet"
+author: "Shawvin"
+date: "8/30/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+suppressMessages(library(leaflet))
+suppressMessages(library(RColorBrewer))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+The webpage will print the date of creating and the interactive map
+
+## Read the data
+```{r,comment=""}
+cities<-read.csv("worldcities.csv")
+head(cities)
+china_cities<-cities[cities$country=="China",]
+head(china_cities)
+```
+
+## Generate the map
+```{r,comment="",echo=FALSE}
+n<-length(unique(china_cities$admin_name))
+china_cities$col<-rainbow(n)[as.factor(as.character(china_cities$admin_name))]
+print(Sys.Date())
+china_cities %>% leaflet() %>% addProviderTiles("Esri.WorldStreetMap") %>% addCircleMarkers(lat = ~lat,lng = ~lng,popup = ~city_ascii, color=~col,clusterOptions = markerClusterOptions())  
+```
