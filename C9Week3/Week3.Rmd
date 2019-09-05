@@ -1,0 +1,42 @@
+---
+title: "Week3 Assignment"
+author: "Shawvin"
+date: "9/3/2019"
+output:
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+
+The slide will create a interactive plot to present the top 10 populated city in China.
+
+
+## Slide with top 10 China cities by populations
+
+```{r china, echo = FALSE,comment=""}
+world<-read.csv("worldcities.csv")
+china<-world[world$country=="China",]
+CH_cities<-china[,c(1,3,4,5,8,10)]
+rownames(CH_cities)<-1:nrow(CH_cities)
+head(CH_cities[order(CH_cities$population,decreasing = T),],n=10,row.names=FALSE)
+CH_cities$hover<-with(CH_cities,paste(city,"<br>","population",population))
+```
+
+## Slide with interactive plot of China cities
+
+```{r CH_cities, echo = FALSE}
+suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(ggplot2))
+o<-order(CH_cities$population,decreasing = T)[1:10]
+g<-ggplot(CH_cities[o,],aes(reorder(city,population),population,fill=admin_name))+geom_bar(stat="identity")+coord_flip()+labs(x="City",title = "Most populated cities in China",fill="Province")
+gg<-ggplotly(g)
+gg
+```
+
+
+
