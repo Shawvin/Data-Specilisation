@@ -1,0 +1,56 @@
+---
+title: "GoogleVis"
+author: "Shawvin"
+date: "9/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+* The R function create an HTML page
+* The HTML page calls Google Charts
+* The result is an interactive HTML graphic
+
+## Example 1
+
+```{r gv1,result="asis",cache=TRUE}
+suppressPackageStartupMessages(library(googleVis))
+M<-gvisMotionChart(Fruits,"Fruit","Year",
+                   options=list(width=600,height=400))
+```
+
+## Example 2
+```{r gv2,result="asis",cache=TRUE}
+G2<-gvisGeoChart(Exports,locationvar = "Country",
+                colorvar = "Profit",options=list(width=600,height=400))
+print(G2,"chart")
+```
+
+
+## Example 3
+```{r gv3,result="asis",cache=TRUE}
+G3<-gvisGeoChart(Exports,locationvar = "Country",
+                colorvar ="Profit",
+                options=list(width=600,height=400,region="150"))
+plot(G3)
+```
+
+## Example 4
+```{r multiplot,dependson="gv",result="asis",cache=TRUE}
+G<-gvisGeoChart(Exports,"Country","Profit",
+                options=list(width=200,height=100))
+T1<-gvisTable(Exports,options=list(width=200,height=270))
+M<-gvisMotionChart(Fruits,"Fruit","Year",
+                   options = list(width=400,hiehgt=370))
+GT<-gvisMerge(G,T1,horizontal = FALSE)
+GTM<-gvisMerge(GT,M,horizontal = TRUE,tableOptions ="bgcolor=\"#CCCCCC\"cellspacing=10")
+```
+
+
+## Combining multiple plots together
+
+```{r, dependson="multiplot",result="asis",cache=TRUE}
+print(GTM,"chart")
+```

@@ -1,0 +1,63 @@
+---
+title: "World App Pitch"
+author: "Shawvin"
+date: "9/24/2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Introduction
+
+This is an R Shiny app presentation. The app use the world map data from ggplot2 package to build a 3D model of Earth. It allow use to choose the color and rotate the earth model in three dimension
+
+## Choose the Palette
+
+There are five available palette to choose from. The slide will show the name and display of the palette.
+```{r,echo = FALSE}
+suppressPackageStartupMessages(library(RColorBrewer))
+par(mfrow=c(3,2))
+display.brewer.pal(11,"PiYG")
+display.brewer.pal(11,"PuOr")
+display.brewer.pal(11,"RdBu")
+display.brewer.pal(11,"RdYlBu")
+display.brewer.pal(11,"RdYlGn")
+```
+
+
+## Rotate in three dimensions
+The app allow user to choose the value for longitude, latitude and angle. As we know, the earth is a three-axial ellipsoid.
+
+- Longitude will make the model roate around polar axis, the value range from -180 to 180
+- Latitude will make the model rotate around one diameter on equator plane, the value range from -90 to 90, at 90 the model will show teh north pole facing and -90 the south pole
+- Angle will make the model rotate around another diameter on equator plane, the value range from -180 to 180
+
+## Example
+We will show a example of the model given the color palette and three values.  
+Palette=Pink Yellow Green, Longtitude=90,Latitude=45,Angle=0
+```{r,echo = FALSE}
+suppressPackageStartupMessages(library(ggplot2))
+
+world_map<-map_data("world")
+world_map$region<-factor(world_map$region)
+Pal="PiYG"
+Lat=45
+Long=90
+Angle=0
+g<- ggplot(data=world_map) + geom_polygon(aes(x=long,y=lat,group=group,fill=as.numeric(region)),
+                             colour="grey",size=.25)
+      g<- g + coord_map("ortho",orientation=c(Lat,Long,Angle))
+      g<- g + scale_y_continuous(breaks=(-6:6)*15) 
+      g<- g + scale_x_continuous(breaks=(-12:12)*15)
+      g<- g + scale_fill_distiller(name="Region ID",palette=Pal)
+      g<- g + theme(
+          panel.background=element_rect(fill="white",colour=NA),
+          panel.grid.major = element_line(colour = "grey60",size=.25),
+          panel.grid.minor = element_line(colour = "grey60",size=.25),
+          axis.text=element_blank(),
+          axis.title=element_blank(),
+          axis.ticks=element_blank())
+      g
+```

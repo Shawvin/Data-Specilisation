@@ -1,0 +1,12 @@
+name: World
+title: World
+username:
+account: shawvin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1237335
+bundleId: 2441163
+url: https://shawvin.shinyapps.io/World/
+when: 1569342468.60756
+asMultiple: FALSE
+asStatic: FALSE
